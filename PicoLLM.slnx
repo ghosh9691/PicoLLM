@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/PicoLLM.Core/PicoLLM.Core.csproj" />
+    <Project Path="src/PicoLLM.Tokenizer/PicoLLM.Tokenizer.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/PicoLLM.Tests/PicoLLM.Tests.csproj" />
+  </Folder>
+</Solution>

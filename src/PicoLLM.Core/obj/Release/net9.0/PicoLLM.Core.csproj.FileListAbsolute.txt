@@ -1,0 +1,12 @@
+D:\source\ghosh9691\PicoLLM\src\PicoLLM.Core\bin\Release\net9.0\PicoLLM.Core.deps.json
+D:\source\ghosh9691\PicoLLM\src\PicoLLM.Core\bin\Release\net9.0\PicoLLM.Core.dll
+D:\source\ghosh9691\PicoLLM\src\PicoLLM.Core\bin\Release\net9.0\PicoLLM.Core.pdb
+D:\source\ghosh9691\PicoLLM\src\PicoLLM.Core\obj\Release\net9.0\PicoLLM.Core.GeneratedMSBuildEditorConfig.editorconfig
+D:\source\ghosh9691\PicoLLM\src\PicoLLM.Core\obj\Release\net9.0\PicoLLM.Core.AssemblyInfoInputs.cache
+D:\source\ghosh9691\PicoLLM\src\PicoLLM.Core\obj\Release\net9.0\PicoLLM.Core.AssemblyInfo.cs
+D:\source\ghosh9691\PicoLLM\src\PicoLLM.Core\obj\Release\net9.0\PicoLLM.Core.csproj.CoreCompileInputs.cache
+D:\source\ghosh9691\PicoLLM\src\PicoLLM.Core\obj\Release\net9.0\PicoLLM.Core.sourcelink.json
+D:\source\ghosh9691\PicoLLM\src\PicoLLM.Core\obj\Release\net9.0\PicoLLM.Core.dll
+D:\source\ghosh9691\PicoLLM\src\PicoLLM.Core\obj\Release\net9.0\refint\PicoLLM.Core.dll
+D:\source\ghosh9691\PicoLLM\src\PicoLLM.Core\obj\Release\net9.0\PicoLLM.Core.pdb
+D:\source\ghosh9691\PicoLLM\src\PicoLLM.Core\obj\Release\net9.0\ref\PicoLLM.Core.dll

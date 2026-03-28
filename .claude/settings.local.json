@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dotnet new:*)",
+      "Bash(dotnet sln:*)",
+      "Bash(dotnet add:*)",
+      "Bash(rm \"D:/source/ghosh9691/PicoLLM/src/PicoLLM.Core/Class1.cs\")",
+      "Bash(rm \"D:/source/ghosh9691/PicoLLM/src/PicoLLM.Tokenizer/Class1.cs\")",
+      "Bash(rm \"D:/source/ghosh9691/PicoLLM/tests/PicoLLM.Tests/UnitTest1.cs\")",
+      "Bash(mkdir -p \"D:/source/ghosh9691/PicoLLM/src/PicoLLM.Core/Tensors\" \"D:/source/ghosh9691/PicoLLM/src/PicoLLM.Core/Activations\" \"D:/source/ghosh9691/PicoLLM/src/PicoLLM.Core/Layers\" \"D:/source/ghosh9691/PicoLLM/tests/PicoLLM.Tests/Tensors\" \"D:/source/ghosh9691/PicoLLM/tests/PicoLLM.Tests/Activations\" \"D:/source/ghosh9691/PicoLLM/tests/PicoLLM.Tests/Tokenizer\" \"D:/source/ghosh9691/PicoLLM/tests/PicoLLM.Tests/Embedding\")",
+      "Bash(dotnet build:*)",
+      "Bash(dotnet test:*)"
+    ]
+  }
+}

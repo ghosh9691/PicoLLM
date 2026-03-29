@@ -123,11 +123,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\source\\ghosh9691\\PicoLLM\\src\\PicoLLM.Browser\\PicoLLM.Browser.csproj",
+      "projectUniqueName": "d:\\source\\ghosh9691\\PicoLLM\\src\\PicoLLM.Browser\\PicoLLM.Browser.csproj",
       "projectName": "PicoLLM.Browser",
-      "projectPath": "D:\\source\\ghosh9691\\PicoLLM\\src\\PicoLLM.Browser\\PicoLLM.Browser.csproj",
+      "projectPath": "d:\\source\\ghosh9691\\PicoLLM\\src\\PicoLLM.Browser\\PicoLLM.Browser.csproj",
       "packagesPath": "C:\\Users\\praba\\.nuget\\packages\\",
-      "outputPath": "D:\\source\\ghosh9691\\PicoLLM\\src\\PicoLLM.Browser\\obj\\",
+      "outputPath": "d:\\source\\ghosh9691\\PicoLLM\\src\\PicoLLM.Browser\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

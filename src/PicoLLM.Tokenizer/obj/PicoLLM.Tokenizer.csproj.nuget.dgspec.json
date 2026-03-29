@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\source\\ghosh9691\\PicoLLM\\src\\PicoLLM.Tokenizer\\PicoLLM.Tokenizer.csproj": {}
+    "d:\\source\\ghosh9691\\PicoLLM\\src\\PicoLLM.Tokenizer\\PicoLLM.Tokenizer.csproj": {}
   },
   "projects": {
-    "D:\\source\\ghosh9691\\PicoLLM\\src\\PicoLLM.Tokenizer\\PicoLLM.Tokenizer.csproj": {
+    "d:\\source\\ghosh9691\\PicoLLM\\src\\PicoLLM.Tokenizer\\PicoLLM.Tokenizer.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\source\\ghosh9691\\PicoLLM\\src\\PicoLLM.Tokenizer\\PicoLLM.Tokenizer.csproj",
+        "projectUniqueName": "d:\\source\\ghosh9691\\PicoLLM\\src\\PicoLLM.Tokenizer\\PicoLLM.Tokenizer.csproj",
         "projectName": "PicoLLM.Tokenizer",
-        "projectPath": "D:\\source\\ghosh9691\\PicoLLM\\src\\PicoLLM.Tokenizer\\PicoLLM.Tokenizer.csproj",
+        "projectPath": "d:\\source\\ghosh9691\\PicoLLM\\src\\PicoLLM.Tokenizer\\PicoLLM.Tokenizer.csproj",
         "packagesPath": "C:\\Users\\praba\\.nuget\\packages\\",
-        "outputPath": "D:\\source\\ghosh9691\\PicoLLM\\src\\PicoLLM.Tokenizer\\obj\\",
+        "outputPath": "d:\\source\\ghosh9691\\PicoLLM\\src\\PicoLLM.Tokenizer\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

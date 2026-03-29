@@ -14,11 +14,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\source\\ghosh9691\\PicoLLM\\src\\PicoLLM.Core\\PicoLLM.Core.csproj",
+      "projectUniqueName": "d:\\source\\ghosh9691\\PicoLLM\\src\\PicoLLM.Core\\PicoLLM.Core.csproj",
       "projectName": "PicoLLM.Core",
-      "projectPath": "D:\\source\\ghosh9691\\PicoLLM\\src\\PicoLLM.Core\\PicoLLM.Core.csproj",
+      "projectPath": "d:\\source\\ghosh9691\\PicoLLM\\src\\PicoLLM.Core\\PicoLLM.Core.csproj",
       "packagesPath": "C:\\Users\\praba\\.nuget\\packages\\",
-      "outputPath": "D:\\source\\ghosh9691\\PicoLLM\\src\\PicoLLM.Core\\obj\\",
+      "outputPath": "d:\\source\\ghosh9691\\PicoLLM\\src\\PicoLLM.Core\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

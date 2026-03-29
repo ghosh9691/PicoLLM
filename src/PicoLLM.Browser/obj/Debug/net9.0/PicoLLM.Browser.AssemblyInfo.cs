@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("PicoLLM.Browser")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+783117e38b7e13fdce9d2736e5c4d8d1bab36806")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9dbc5c9d7f9228f1a8f78785efb997c877ef78f4")]
 [assembly: System.Reflection.AssemblyProductAttribute("PicoLLM.Browser")]
 [assembly: System.Reflection.AssemblyTitleAttribute("PicoLLM.Browser")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

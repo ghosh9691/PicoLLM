@@ -49,11 +49,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\source\\ghosh9691\\PicoLLM\\src\\PicoLLM.Training\\PicoLLM.Training.csproj",
+      "projectUniqueName": "d:\\source\\ghosh9691\\PicoLLM\\src\\PicoLLM.Training\\PicoLLM.Training.csproj",
       "projectName": "PicoLLM.Training",
-      "projectPath": "D:\\source\\ghosh9691\\PicoLLM\\src\\PicoLLM.Training\\PicoLLM.Training.csproj",
+      "projectPath": "d:\\source\\ghosh9691\\PicoLLM\\src\\PicoLLM.Training\\PicoLLM.Training.csproj",
       "packagesPath": "C:\\Users\\praba\\.nuget\\packages\\",
-      "outputPath": "D:\\source\\ghosh9691\\PicoLLM\\src\\PicoLLM.Training\\obj\\",
+      "outputPath": "d:\\source\\ghosh9691\\PicoLLM\\src\\PicoLLM.Training\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -75,11 +75,11 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "projectReferences": {
-            "D:\\source\\ghosh9691\\PicoLLM\\src\\PicoLLM.Core\\PicoLLM.Core.csproj": {
-              "projectPath": "D:\\source\\ghosh9691\\PicoLLM\\src\\PicoLLM.Core\\PicoLLM.Core.csproj"
+            "d:\\source\\ghosh9691\\PicoLLM\\src\\PicoLLM.Core\\PicoLLM.Core.csproj": {
+              "projectPath": "d:\\source\\ghosh9691\\PicoLLM\\src\\PicoLLM.Core\\PicoLLM.Core.csproj"
             },
-            "D:\\source\\ghosh9691\\PicoLLM\\src\\PicoLLM.Tokenizer\\PicoLLM.Tokenizer.csproj": {
-              "projectPath": "D:\\source\\ghosh9691\\PicoLLM\\src\\PicoLLM.Tokenizer\\PicoLLM.Tokenizer.csproj"
+            "d:\\source\\ghosh9691\\PicoLLM\\src\\PicoLLM.Tokenizer\\PicoLLM.Tokenizer.csproj": {
+              "projectPath": "d:\\source\\ghosh9691\\PicoLLM\\src\\PicoLLM.Tokenizer\\PicoLLM.Tokenizer.csproj"
             }
           }
         }

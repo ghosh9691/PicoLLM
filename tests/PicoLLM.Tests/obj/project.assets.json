@@ -1164,11 +1164,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\source\\ghosh9691\\PicoLLM\\tests\\PicoLLM.Tests\\PicoLLM.Tests.csproj",
+      "projectUniqueName": "d:\\source\\ghosh9691\\PicoLLM\\tests\\PicoLLM.Tests\\PicoLLM.Tests.csproj",
       "projectName": "PicoLLM.Tests",
-      "projectPath": "D:\\source\\ghosh9691\\PicoLLM\\tests\\PicoLLM.Tests\\PicoLLM.Tests.csproj",
+      "projectPath": "d:\\source\\ghosh9691\\PicoLLM\\tests\\PicoLLM.Tests\\PicoLLM.Tests.csproj",
       "packagesPath": "C:\\Users\\praba\\.nuget\\packages\\",
-      "outputPath": "D:\\source\\ghosh9691\\PicoLLM\\tests\\PicoLLM.Tests\\obj\\",
+      "outputPath": "d:\\source\\ghosh9691\\PicoLLM\\tests\\PicoLLM.Tests\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -1190,17 +1190,17 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "projectReferences": {
-            "D:\\source\\ghosh9691\\PicoLLM\\src\\PicoLLM.Browser\\PicoLLM.Browser.csproj": {
-              "projectPath": "D:\\source\\ghosh9691\\PicoLLM\\src\\PicoLLM.Browser\\PicoLLM.Browser.csproj"
+            "d:\\source\\ghosh9691\\PicoLLM\\src\\PicoLLM.Browser\\PicoLLM.Browser.csproj": {
+              "projectPath": "d:\\source\\ghosh9691\\PicoLLM\\src\\PicoLLM.Browser\\PicoLLM.Browser.csproj"
             },
-            "D:\\source\\ghosh9691\\PicoLLM\\src\\PicoLLM.Core\\PicoLLM.Core.csproj": {
-              "projectPath": "D:\\source\\ghosh9691\\PicoLLM\\src\\PicoLLM.Core\\PicoLLM.Core.csproj"
+            "d:\\source\\ghosh9691\\PicoLLM\\src\\PicoLLM.Core\\PicoLLM.Core.csproj": {
+              "projectPath": "d:\\source\\ghosh9691\\PicoLLM\\src\\PicoLLM.Core\\PicoLLM.Core.csproj"
             },
-            "D:\\source\\ghosh9691\\PicoLLM\\src\\PicoLLM.Tokenizer\\PicoLLM.Tokenizer.csproj": {
-              "projectPath": "D:\\source\\ghosh9691\\PicoLLM\\src\\PicoLLM.Tokenizer\\PicoLLM.Tokenizer.csproj"
+            "d:\\source\\ghosh9691\\PicoLLM\\src\\PicoLLM.Tokenizer\\PicoLLM.Tokenizer.csproj": {
+              "projectPath": "d:\\source\\ghosh9691\\PicoLLM\\src\\PicoLLM.Tokenizer\\PicoLLM.Tokenizer.csproj"
             },
-            "D:\\source\\ghosh9691\\PicoLLM\\src\\PicoLLM.Training\\PicoLLM.Training.csproj": {
-              "projectPath": "D:\\source\\ghosh9691\\PicoLLM\\src\\PicoLLM.Training\\PicoLLM.Training.csproj"
+            "d:\\source\\ghosh9691\\PicoLLM\\src\\PicoLLM.Training\\PicoLLM.Training.csproj": {
+              "projectPath": "d:\\source\\ghosh9691\\PicoLLM\\src\\PicoLLM.Training\\PicoLLM.Training.csproj"
             }
           }
         }

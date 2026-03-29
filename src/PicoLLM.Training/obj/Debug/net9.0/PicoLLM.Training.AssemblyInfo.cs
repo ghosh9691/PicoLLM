@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("PicoLLM.Training")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c5fbf60f1024f2c093d9cf349ec3e5c227ce399d")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+783117e38b7e13fdce9d2736e5c4d8d1bab36806")]
 [assembly: System.Reflection.AssemblyProductAttribute("PicoLLM.Training")]
 [assembly: System.Reflection.AssemblyTitleAttribute("PicoLLM.Training")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

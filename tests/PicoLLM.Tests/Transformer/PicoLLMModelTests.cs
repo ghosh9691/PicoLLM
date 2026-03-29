@@ -67,7 +67,7 @@ public class PicoLLMModelTests
     public void GetAllParameters_SumMatchesTotalParameters()
     {
         var model = new PicoLLMModel(SmallConfig(), seed: 1);
-        int total = model.GetAllParameters().Sum(p => p.Length);
+        int total = model.GetAllParameters().Sum(p => p.Data.Length);
         total.Should().Be(model.TotalParameters());
     }
 

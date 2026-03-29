@@ -1,3 +1,4 @@
+using PicoLLM.Core.Compute;
 using PicoLLM.Core.Tensors;
 using PicoLLM.Core.Training;
 
@@ -13,6 +14,7 @@ public sealed class LinearLayer : ILayer
 {
     private readonly Parameter _weightsParam;
     private readonly Parameter? _biasParam;
+    private readonly IComputeProvider? _computeProvider;
     private Tensor? _lastInput;
 
     /// <summary>Weight matrix, shape [in_features, out_features].</summary>
@@ -40,7 +42,8 @@ public sealed class LinearLayer : ILayer
     /// <param name="outFeatures">Number of output features.</param>
     /// <param name="useBias">Whether to include a bias term.</param>
     /// <param name="seed">Optional random seed for reproducibility.</param>
-    public LinearLayer(int inFeatures, int outFeatures, bool useBias = true, int? seed = null)
+    public LinearLayer(int inFeatures, int outFeatures, bool useBias = true, int? seed = null,
+        IComputeProvider? computeProvider = null)
     {
         if (inFeatures <= 0) throw new ArgumentOutOfRangeException(nameof(inFeatures));
         if (outFeatures <= 0) throw new ArgumentOutOfRangeException(nameof(outFeatures));
@@ -52,6 +55,8 @@ public sealed class LinearLayer : ILayer
 
         if (useBias)
             _biasParam = new Parameter(TensorFactory.Zeros(outFeatures));
+
+        _computeProvider = computeProvider;
     }
 
     /// <summary>
@@ -71,7 +76,9 @@ public sealed class LinearLayer : ILayer
 
         int rows = input.Length / InFeatures;
         var flat = TensorMath.Reshape(input, rows, InFeatures);
-        var result = TensorMath.MatMul(flat, Weights);
+        var result = _computeProvider is not null
+            ? _computeProvider.MatMul(flat, Weights)
+            : TensorMath.MatMul(flat, Weights);
 
         if (Bias is not null)
         {

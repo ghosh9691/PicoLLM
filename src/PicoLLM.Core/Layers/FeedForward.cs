@@ -1,4 +1,5 @@
 using PicoLLM.Core.Activations;
+using PicoLLM.Core.Compute;
 using PicoLLM.Core.Tensors;
 using PicoLLM.Core.Training;
 
@@ -32,14 +33,18 @@ public sealed class FeedForward : ILayer
     /// <param name="embedDim">Input and output dimension.</param>
     /// <param name="ffMultiplier">Expansion factor for the hidden layer (default 4).</param>
     /// <param name="seed">Optional random seed for weight initialization.</param>
-    public FeedForward(int embedDim, int ffMultiplier = 4, int? seed = null)
+    public FeedForward(int embedDim, int ffMultiplier = 4, int? seed = null,
+        IComputeProvider? computeProvider = null)
     {
         if (embedDim <= 0) throw new ArgumentOutOfRangeException(nameof(embedDim));
         if (ffMultiplier <= 0) throw new ArgumentOutOfRangeException(nameof(ffMultiplier));
 
         FfDim = embedDim * ffMultiplier;
-        _up   = new LinearLayer(embedDim, FfDim,   useBias: true, seed: seed);
-        _down = new LinearLayer(FfDim,   embedDim, useBias: true, seed: seed.HasValue ? seed + 1 : null);
+        _up   = new LinearLayer(embedDim, FfDim,   useBias: true, seed: seed,
+                    computeProvider: computeProvider);
+        _down = new LinearLayer(FfDim,   embedDim, useBias: true,
+                    seed: seed.HasValue ? seed + 1 : null,
+                    computeProvider: computeProvider);
     }
 
     /// <summary>

@@ -1,3 +1,4 @@
+using PicoLLM.Core.Compute;
 using PicoLLM.Core.Tensors;
 using PicoLLM.Core.Training;
 
@@ -39,12 +40,13 @@ public sealed class DecoderBlock : ILayer
     /// <summary>
     /// Initializes a decoder block.
     /// </summary>
-    public DecoderBlock(int embedDim, int numHeads, int ffMultiplier = 4, int? seed = null)
+    public DecoderBlock(int embedDim, int numHeads, int ffMultiplier = 4, int? seed = null,
+        IComputeProvider? computeProvider = null)
     {
         _attnNorm = new LayerNorm(embedDim);
-        Attention = new MultiHeadAttention(embedDim, numHeads, seed);
+        Attention = new MultiHeadAttention(embedDim, numHeads, seed, computeProvider);
         _ffnNorm  = new LayerNorm(embedDim);
-        FFN       = new FeedForward(embedDim, ffMultiplier, seed);
+        FFN       = new FeedForward(embedDim, ffMultiplier, seed, computeProvider);
     }
 
     /// <summary>Forward pass with pre-norm residual connections.</summary>

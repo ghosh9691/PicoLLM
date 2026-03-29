@@ -75,4 +75,27 @@ public class ComputeProviderTests
         act.Should().NotThrow();
     }
 
+    [Fact]
+    public void PicoLLMModel_WithCpuProvider_ProducesSameOutputAsDefault()
+    {
+        var config = new PicoLLM.Core.Model.ModelConfig(
+            VocabSize: 32, EmbedDim: 16, NumHeads: 2,
+            NumLayers: 1, FfMultiplier: 2, MaxSeqLen: 8);
+
+        var modelDefault  = new PicoLLM.Core.Model.PicoLLMModel(config, seed: 99);
+        var modelWithCpu  = new PicoLLM.Core.Model.PicoLLMModel(config, seed: 99,
+            computeProvider: new CpuComputeProvider());
+
+        var ids = new int[,] { { 1, 2, 3, 4 } };
+
+        var outDefault = modelDefault.Forward(ids);
+        var outWithCpu = modelWithCpu.Forward(ids);
+
+        outDefault.Shape[0].Should().Be(outWithCpu.Shape[0]);
+        outDefault.Shape[1].Should().Be(outWithCpu.Shape[1]);
+        outDefault.Shape[2].Should().Be(outWithCpu.Shape[2]);
+
+        for (int i = 0; i < outDefault.Data.Length; i++)
+            outDefault.Data[i].Should().BeApproximately(outWithCpu.Data[i], 1e-5f);
+    }
 }

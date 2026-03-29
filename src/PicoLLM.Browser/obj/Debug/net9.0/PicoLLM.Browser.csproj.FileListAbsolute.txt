@@ -1,0 +1,13 @@
+D:\source\ghosh9691\PicoLLM\src\PicoLLM.Browser\bin\Debug\net9.0\PicoLLM.Browser.deps.json
+D:\source\ghosh9691\PicoLLM\src\PicoLLM.Browser\bin\Debug\net9.0\PicoLLM.Browser.dll
+D:\source\ghosh9691\PicoLLM\src\PicoLLM.Browser\bin\Debug\net9.0\PicoLLM.Browser.pdb
+D:\source\ghosh9691\PicoLLM\src\PicoLLM.Browser\obj\Debug\net9.0\PicoLLM.Browser.csproj.AssemblyReference.cache
+D:\source\ghosh9691\PicoLLM\src\PicoLLM.Browser\obj\Debug\net9.0\PicoLLM.Browser.GeneratedMSBuildEditorConfig.editorconfig
+D:\source\ghosh9691\PicoLLM\src\PicoLLM.Browser\obj\Debug\net9.0\PicoLLM.Browser.AssemblyInfoInputs.cache
+D:\source\ghosh9691\PicoLLM\src\PicoLLM.Browser\obj\Debug\net9.0\PicoLLM.Browser.AssemblyInfo.cs
+D:\source\ghosh9691\PicoLLM\src\PicoLLM.Browser\obj\Debug\net9.0\PicoLLM.Browser.csproj.CoreCompileInputs.cache
+D:\source\ghosh9691\PicoLLM\src\PicoLLM.Browser\obj\Debug\net9.0\PicoLLM.Browser.sourcelink.json
+D:\source\ghosh9691\PicoLLM\src\PicoLLM.Browser\obj\Debug\net9.0\PicoLLM.Browser.dll
+D:\source\ghosh9691\PicoLLM\src\PicoLLM.Browser\obj\Debug\net9.0\refint\PicoLLM.Browser.dll
+D:\source\ghosh9691\PicoLLM\src\PicoLLM.Browser\obj\Debug\net9.0\PicoLLM.Browser.pdb
+D:\source\ghosh9691\PicoLLM\src\PicoLLM.Browser\obj\Debug\net9.0\ref\PicoLLM.Browser.dll

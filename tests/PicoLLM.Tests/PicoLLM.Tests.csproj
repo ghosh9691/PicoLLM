@@ -22,6 +22,8 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\PicoLLM.Core\PicoLLM.Core.csproj" />
     <ProjectReference Include="..\..\src\PicoLLM.Tokenizer\PicoLLM.Tokenizer.csproj" />
+    <ProjectReference Include="..\..\src\PicoLLM.Training\PicoLLM.Training.csproj" />
+    <ProjectReference Include="..\..\src\PicoLLM.Browser\PicoLLM.Browser.csproj" />
   </ItemGroup>
 
 </Project>

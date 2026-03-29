@@ -30,6 +30,12 @@ public sealed class DecoderBlock : ILayer
     /// <summary>The feedforward sublayer.</summary>
     public FeedForward FFN { get; }
 
+    /// <summary>The pre-attention layer normalisation sublayer.</summary>
+    public LayerNorm AttnNorm => _attnNorm;
+
+    /// <summary>The pre-feedforward layer normalisation sublayer.</summary>
+    public LayerNorm FfnNorm => _ffnNorm;
+
     /// <summary>
     /// Initializes a decoder block.
     /// </summary>

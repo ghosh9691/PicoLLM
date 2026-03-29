@@ -20,6 +20,12 @@ public sealed class FeedForward : ILayer
     /// <summary>The hidden (expanded) dimension: embed_dim × ff_multiplier.</summary>
     public int FfDim { get; }
 
+    /// <summary>The up-projection linear layer [embed_dim → ff_dim].</summary>
+    public LinearLayer Up => _up;
+
+    /// <summary>The down-projection linear layer [ff_dim → embed_dim].</summary>
+    public LinearLayer Down => _down;
+
     /// <summary>
     /// Initializes the feedforward sublayer.
     /// </summary>

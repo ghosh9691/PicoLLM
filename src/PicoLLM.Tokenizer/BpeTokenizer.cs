@@ -147,6 +147,52 @@ public sealed class BpeTokenizer
         return Encoding.UTF8.GetString(bytes.ToArray());
     }
 
+    /// <summary>
+    /// Returns string representations and token types for all tokens in the vocabulary,
+    /// ordered by token ID from 0 to VocabSize-1. Used by the GGUF exporter.
+    /// </summary>
+    /// <returns>
+    /// A tuple of:
+    /// - <c>Tokens</c>: string representation of each token (special name, hex byte, or decoded text).
+    /// - <c>TokenTypes</c>: GGUF token type for each token (3=special, 6=byte, 1=normal).
+    /// </returns>
+    public (string[] Tokens, int[] TokenTypes) GetVocabRepresentations()
+    {
+        var tokens = new string[_vocabSize];
+        var types  = new int[_vocabSize];
+
+        // Special tokens: IDs 0-3
+        tokens[PadId] = "<|pad|>"; types[PadId] = 3;
+        tokens[UnkId] = "<|unk|>"; types[UnkId] = 3;
+        tokens[BosId] = "<|bos|>"; types[BosId] = 3;
+        tokens[EosId] = "<|eos|>"; types[EosId] = 3;
+
+        // Byte tokens: IDs 4-259 (ByteOffset + 0..255)
+        for (int b = 0; b < 256; b++)
+        {
+            int id = b + ByteOffset;
+            tokens[id] = $"<0x{b:X2}>";
+            types[id]  = 6;
+        }
+
+        // Merged tokens: IDs 260+ — decode byte sequence as UTF-8 (best effort)
+        for (int id = ByteOffset + 256; id < _vocabSize; id++)
+        {
+            if (_vocab.TryGetValue(id, out var bytes) && bytes.Length > 0)
+            {
+                try   { tokens[id] = System.Text.Encoding.UTF8.GetString(bytes); }
+                catch { tokens[id] = $"<token_{id}>"; }
+            }
+            else
+            {
+                tokens[id] = $"<token_{id}>";
+            }
+            types[id] = 1;
+        }
+
+        return (tokens, types);
+    }
+
     // ── Persistence ──────────────────────────────────────────────────────────
 
     /// <summary>Saves the tokenizer to a JSON file at <paramref name="path"/>.</summary>

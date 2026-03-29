@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/PicoLLM.Core/PicoLLM.Core.csproj" />
+    <Project Path="src/PicoLLM.Gguf/PicoLLM.Gguf.csproj" />
     <Project Path="src/PicoLLM.Tokenizer/PicoLLM.Tokenizer.csproj" />
     <Project Path="src/PicoLLM.Training/PicoLLM.Training.csproj" />
     <Project Path="src/PicoLLM.Browser/PicoLLM.Browser.csproj" />

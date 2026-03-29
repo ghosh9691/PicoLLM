@@ -31,6 +31,18 @@ public sealed class PicoLLMModel
     /// <summary>Model hyperparameters.</summary>
     public ModelConfig Config { get; }
 
+    /// <summary>The combined token + positional embedding layer.</summary>
+    public EmbeddingLayer Embedding => _embedding;
+
+    /// <summary>The decoder blocks, one per transformer layer.</summary>
+    public IReadOnlyList<DecoderBlock> Blocks => _blocks;
+
+    /// <summary>The final layer normalisation applied before the LM head.</summary>
+    public LayerNorm FinalNorm => _finalNorm;
+
+    /// <summary>The language model head linear projection [embed_dim → vocab_size].</summary>
+    public LinearLayer LmHead => _lmHead;
+
     /// <summary>
     /// Initializes the model with the given configuration.
     /// </summary>

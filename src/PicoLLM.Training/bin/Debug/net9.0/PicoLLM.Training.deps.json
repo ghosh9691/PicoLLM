@@ -1,0 +1,53 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v9.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v9.0": {
+      "PicoLLM.Training/1.0.0": {
+        "dependencies": {
+          "PicoLLM.Core": "1.0.0",
+          "PicoLLM.Tokenizer": "1.0.0"
+        },
+        "runtime": {
+          "PicoLLM.Training.dll": {}
+        }
+      },
+      "PicoLLM.Core/1.0.0": {
+        "runtime": {
+          "PicoLLM.Core.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "PicoLLM.Tokenizer/1.0.0": {
+        "runtime": {
+          "PicoLLM.Tokenizer.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "PicoLLM.Training/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "PicoLLM.Core/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "PicoLLM.Tokenizer/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

@@ -98,6 +98,16 @@ public static class TensorFactory
 
     // ── Helpers ────────────────────────────────────────────────────────────
 
+    /// <summary>
+    /// Creates a tensor from an existing float array (defensive copy).
+    /// Used by the training pipeline to wrap computed gradient arrays.
+    /// </summary>
+    public static Tensor FromArray(int[] shape, float[] data)
+    {
+        var copy = (float[])data.Clone();
+        return new Tensor(shape, copy);
+    }
+
     /// <summary>Creates a 1-D identity tensor with the given size (diagonal of 1s).</summary>
     public static Tensor Eye(int size)
     {

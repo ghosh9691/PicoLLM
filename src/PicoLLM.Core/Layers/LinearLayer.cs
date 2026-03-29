@@ -1,4 +1,5 @@
 using PicoLLM.Core.Tensors;
+using PicoLLM.Core.Training;
 
 namespace PicoLLM.Core.Layers;
 
@@ -6,20 +7,25 @@ namespace PicoLLM.Core.Layers;
 /// Fully-connected (dense) linear layer: output = input @ Weights + Bias.
 /// Supports 2D input [rows, in_features] and 3D input [batch, seq, in_features].
 /// All leading dimensions are preserved; only the last dimension is transformed.
+/// Implements <see cref="ILayer"/> for use in the training pipeline.
 /// </summary>
-public sealed class LinearLayer
+public sealed class LinearLayer : ILayer
 {
+    private readonly Parameter _weightsParam;
+    private readonly Parameter? _biasParam;
+    private Tensor? _lastInput;
+
     /// <summary>Weight matrix, shape [in_features, out_features].</summary>
-    public Tensor Weights { get; }
+    public Tensor Weights => _weightsParam.Data;
 
     /// <summary>Bias vector, shape [out_features], or null if bias is disabled.</summary>
-    public Tensor? Bias { get; }
+    public Tensor? Bias => _biasParam?.Data;
 
-    /// <summary>Accumulated gradient for weights.</summary>
-    public Tensor WeightGrad { get; }
+    /// <summary>Accumulated gradient for weights (same shape as Weights).</summary>
+    public Tensor WeightGrad => _weightsParam.Grad;
 
     /// <summary>Accumulated gradient for bias, or null if bias is disabled.</summary>
-    public Tensor? BiasGrad { get; }
+    public Tensor? BiasGrad => _biasParam?.Grad;
 
     /// <summary>Number of input features.</summary>
     public int InFeatures { get; }
@@ -41,22 +47,18 @@ public sealed class LinearLayer
 
         InFeatures = inFeatures;
         OutFeatures = outFeatures;
-        Weights = TensorFactory.XavierUniform([inFeatures, outFeatures], inFeatures, outFeatures, seed);
-        WeightGrad = TensorFactory.Zeros(inFeatures, outFeatures);
+        _weightsParam = new Parameter(
+            TensorFactory.XavierUniform([inFeatures, outFeatures], inFeatures, outFeatures, seed));
 
         if (useBias)
-        {
-            Bias = TensorFactory.Zeros(outFeatures);
-            BiasGrad = TensorFactory.Zeros(outFeatures);
-        }
+            _biasParam = new Parameter(TensorFactory.Zeros(outFeatures));
     }
 
     /// <summary>
     /// Forward pass. output = input @ Weights + Bias.
+    /// Caches input for use in <see cref="Backward"/>.
     /// Supports any rank ≥ 2: all leading dimensions pass through unchanged.
     /// </summary>
-    /// <param name="input">Input tensor with last dimension = InFeatures.</param>
-    /// <returns>Output tensor with last dimension = OutFeatures.</returns>
     public Tensor Forward(Tensor input)
     {
         int rank = input.Rank;
@@ -65,10 +67,11 @@ public sealed class LinearLayer
             throw new ArgumentException(
                 $"Last dimension {lastDim} does not match InFeatures {InFeatures}.");
 
-        // Flatten all leading dims into one row dimension, matmul, then restore shape.
+        _lastInput = input;
+
         int rows = input.Length / InFeatures;
-        var flat = TensorMath.Reshape(input, rows, InFeatures);  // [rows, in]
-        var result = TensorMath.MatMul(flat, Weights);            // [rows, out]
+        var flat = TensorMath.Reshape(input, rows, InFeatures);
+        var result = TensorMath.MatMul(flat, Weights);
 
         if (Bias is not null)
         {
@@ -79,24 +82,61 @@ public sealed class LinearLayer
                     r[i * OutFeatures + j] += bias[j];
         }
 
-        // Restore original leading dims + OutFeatures
         var outShape = new int[rank];
         for (int i = 0; i < rank - 1; i++) outShape[i] = input.Shape[i];
         outShape[rank - 1] = OutFeatures;
         return TensorMath.Reshape(result, outShape);
     }
 
+    /// <summary>
+    /// Backward pass.
+    /// Accumulates dW and db into parameter gradients.
+    /// Returns gradient w.r.t. input (dx = gradOutput @ W^T).
+    /// </summary>
+    public Tensor Backward(Tensor gradOutput)
+    {
+        if (_lastInput is null)
+            throw new InvalidOperationException("Forward() must be called before Backward().");
+
+        int rank = _lastInput.Rank;
+        int rows = _lastInput.Length / InFeatures;
+
+        var gradFlat  = TensorMath.Reshape(gradOutput, rows, OutFeatures); // [rows, out]
+        var inputFlat = TensorMath.Reshape(_lastInput, rows, InFeatures);  // [rows, in]
+
+        // dW += input^T @ grad
+        var dW = TensorMath.MatMul(TensorMath.Transpose(inputFlat, 0, 1), gradFlat); // [in, out]
+        var wg = WeightGrad.MutableData;
+        var dwData = dW.Data;
+        for (int i = 0; i < wg.Length; i++) wg[i] += dwData[i];
+
+        // db += Σ(grad, axis=0)
+        if (_biasParam is not null)
+        {
+            var bg = _biasParam.Grad.MutableData;
+            var gd = gradFlat.Data;
+            for (int i = 0; i < rows; i++)
+                for (int j = 0; j < OutFeatures; j++)
+                    bg[j] += gd[i * OutFeatures + j];
+        }
+
+        // dx = grad @ W^T → [rows, in], reshape to original shape
+        var dxFlat = TensorMath.MatMul(gradFlat, TensorMath.Transpose(Weights, 0, 1));
+        return TensorMath.Reshape(dxFlat, _lastInput.GetShape());
+    }
+
     /// <summary>Zeros the accumulated gradients.</summary>
     public void ZeroGrad()
     {
-        WeightGrad.MutableData.Clear();
-        BiasGrad?.MutableData.Clear();
+        _weightsParam.ZeroGrad();
+        _biasParam?.ZeroGrad();
+        _lastInput = null;
     }
 
     /// <summary>Returns all learnable parameters (Weights, then Bias if present).</summary>
-    public IEnumerable<Tensor> Parameters()
+    public IEnumerable<Parameter> Parameters()
     {
-        yield return Weights;
-        if (Bias is not null) yield return Bias;
+        yield return _weightsParam;
+        if (_biasParam is not null) yield return _biasParam;
     }
 }

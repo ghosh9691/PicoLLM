@@ -1,33 +1,34 @@
 using PicoLLM.Core.Tensors;
+using PicoLLM.Core.Training;
 
 namespace PicoLLM.Core.Layers;
 
 /// <summary>
 /// Learnable token embedding lookup table.
 /// Maps each token ID to a dense vector of size <see cref="EmbedDim"/>.
-/// Equivalent to a one-hot multiply against the weight matrix, but implemented
-/// as a direct row-lookup for efficiency.
 /// </summary>
 /// <remarks>
 /// Forward: For each token ID t, return row t from <see cref="Weights"/>.
 /// Output shape: [seq_len, embed_dim].
 ///
-/// Backward: Accumulate the upstream gradient into the rows of <see cref="WeightGrad"/>
+/// Backward: Accumulate the upstream gradient into the rows of the weight gradient
 /// that were accessed during the forward pass (sparse update).
 /// </remarks>
 public sealed class TokenEmbedding
 {
+    private readonly Parameter _weightsParam;
+
     /// <summary>
     /// Embedding weight matrix, shape [vocab_size, embed_dim].
     /// Each row is the embedding vector for one token.
     /// </summary>
-    public Tensor Weights { get; }
+    public Tensor Weights => _weightsParam.Data;
 
     /// <summary>
     /// Accumulated gradient for <see cref="Weights"/>, same shape [vocab_size, embed_dim].
-    /// Reset to zero by the optimizer after each parameter update.
+    /// Reset to zero before each training step.
     /// </summary>
-    public Tensor WeightGrad { get; }
+    public Tensor WeightGrad => _weightsParam.Grad;
 
     /// <summary>Number of tokens in the vocabulary.</summary>
     public int VocabSize { get; }
@@ -35,13 +36,13 @@ public sealed class TokenEmbedding
     /// <summary>Dimension of each embedding vector.</summary>
     public int EmbedDim { get; }
 
+    /// <summary>The underlying Parameter object for use by the optimizer.</summary>
+    public Parameter WeightsParameter => _weightsParam;
+
     /// <summary>
     /// Initializes a new token embedding layer.
     /// Weights are drawn from N(0, 0.02) — the GPT-2 convention.
     /// </summary>
-    /// <param name="vocabSize">Number of tokens in the vocabulary.</param>
-    /// <param name="embedDim">Size of each embedding vector.</param>
-    /// <param name="seed">Optional random seed for reproducibility.</param>
     public TokenEmbedding(int vocabSize, int embedDim, int? seed = null)
     {
         if (vocabSize <= 0) throw new ArgumentOutOfRangeException(nameof(vocabSize));
@@ -49,19 +50,16 @@ public sealed class TokenEmbedding
 
         VocabSize = vocabSize;
         EmbedDim = embedDim;
-        Weights = TensorFactory.RandomNormal([vocabSize, embedDim], mean: 0f, std: 0.02f, seed: seed);
-        WeightGrad = TensorFactory.Zeros(vocabSize, embedDim);
+        _weightsParam = new Parameter(
+            TensorFactory.RandomNormal([vocabSize, embedDim], mean: 0f, std: 0.02f, seed: seed));
     }
 
-    /// <summary>
-    /// Internal constructor for loading saved weights.
-    /// </summary>
+    /// <summary>Internal constructor for loading saved weights.</summary>
     internal TokenEmbedding(Tensor weights)
     {
         VocabSize = weights.Shape[0];
         EmbedDim = weights.Shape[1];
-        Weights = weights;
-        WeightGrad = TensorFactory.Zeros(VocabSize, EmbedDim);
+        _weightsParam = new Parameter(weights);
     }
 
     /// <summary>
@@ -95,8 +93,6 @@ public sealed class TokenEmbedding
     /// Backward pass: accumulate gradient into the rows that were used in the forward pass.
     /// Only the rows corresponding to <paramref name="tokenIds"/> are updated (sparse gradient).
     /// </summary>
-    /// <param name="gradOutput">Upstream gradient, shape [seq_len, embed_dim].</param>
-    /// <param name="tokenIds">The same token IDs used in the corresponding forward call.</param>
     public void Backward(Tensor gradOutput, int[] tokenIds)
     {
         ArgumentNullException.ThrowIfNull(gradOutput);
@@ -116,8 +112,5 @@ public sealed class TokenEmbedding
     }
 
     /// <summary>Zeros out the accumulated gradient (called by the optimizer after each step).</summary>
-    public void ZeroGrad()
-    {
-        WeightGrad.MutableData.Clear();
-    }
+    public void ZeroGrad() => _weightsParam.ZeroGrad();
 }

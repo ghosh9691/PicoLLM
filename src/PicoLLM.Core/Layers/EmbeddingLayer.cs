@@ -102,6 +102,31 @@ public sealed class EmbeddingLayer
         _tokenEmbed.Backward(gradOutput, tokenIds);
     }
 
+    /// <summary>
+    /// Backward pass for a batched sequence.
+    /// Splits the [batch, seq, embed_dim] gradient and accumulates into token embedding rows.
+    /// </summary>
+    /// <param name="gradOutput">Upstream gradient, shape [batch, seq, embed_dim].</param>
+    /// <param name="batchTokenIds">Token IDs used in the forward pass, one array per batch item.</param>
+    public void BackwardBatch(Tensor gradOutput, int[][] batchTokenIds)
+    {
+        ArgumentNullException.ThrowIfNull(gradOutput);
+        ArgumentNullException.ThrowIfNull(batchTokenIds);
+
+        int batch   = batchTokenIds.Length;
+        int seqLen  = batchTokenIds[0].Length;
+        int embedDim = _tokenEmbed.EmbedDim;
+
+        for (int b = 0; b < batch; b++)
+        {
+            // Slice [seq, embed] from [batch, seq, embed]
+            var seqGrad = TensorMath.Slice(
+                TensorMath.Reshape(gradOutput, batch * seqLen, embedDim),
+                b * seqLen, seqLen);
+            _tokenEmbed.Backward(seqGrad, batchTokenIds[b]);
+        }
+    }
+
     /// <summary>Zeros accumulated gradients in the token embedding.</summary>
     public void ZeroGrad()
     {

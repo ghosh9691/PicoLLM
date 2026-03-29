@@ -1,5 +1,6 @@
 using PicoLLM.Core.Activations;
 using PicoLLM.Core.Tensors;
+using PicoLLM.Core.Training;
 
 namespace PicoLLM.Core.Layers;
 
@@ -8,11 +9,13 @@ namespace PicoLLM.Core.Layers;
 /// Architecture: Linear(embed_dim → ff_dim) → GELU → Linear(ff_dim → embed_dim).
 /// The hidden (ff) dimension is embed_dim × ff_multiplier (typically 4).
 /// Input/output shape: [batch, seq, embed_dim].
+/// Implements <see cref="ILayer"/> for use in the training pipeline.
 /// </summary>
-public sealed class FeedForward
+public sealed class FeedForward : ILayer
 {
     private readonly LinearLayer _up;    // [embed_dim, ff_dim]
     private readonly LinearLayer _down;  // [ff_dim, embed_dim]
+    private Tensor? _upOutput;           // cached pre-GELU values for backward
 
     /// <summary>The hidden (expanded) dimension: embed_dim × ff_multiplier.</summary>
     public int FfDim { get; }
@@ -35,13 +38,29 @@ public sealed class FeedForward
 
     /// <summary>
     /// Forward pass: up-project → GELU → down-project.
+    /// Caches pre-GELU values for <see cref="Backward"/>.
     /// </summary>
-    /// <param name="x">Input [batch, seq, embed_dim].</param>
-    /// <returns>Output [batch, seq, embed_dim].</returns>
     public Tensor Forward(Tensor x)
     {
-        var hidden = GELU.Forward(_up.Forward(x));
+        _upOutput = _up.Forward(x);
+        var hidden = GELU.Forward(_upOutput);
         return _down.Forward(hidden);
+    }
+
+    /// <summary>
+    /// Backward pass.
+    /// d_down_input = down.Backward(gradOutput)
+    /// d_up_output  = d_down_input * GELU'(_upOutput)
+    /// dx           = up.Backward(d_up_output)
+    /// </summary>
+    public Tensor Backward(Tensor gradOutput)
+    {
+        if (_upOutput is null)
+            throw new InvalidOperationException("Forward() must be called before Backward().");
+
+        var dHidden    = _down.Backward(gradOutput);
+        var dUpOutput  = TensorMath.Multiply(dHidden, GELU.Backward(_upOutput));
+        return _up.Backward(dUpOutput);
     }
 
     /// <summary>Zeros the accumulated gradients.</summary>
@@ -49,9 +68,10 @@ public sealed class FeedForward
     {
         _up.ZeroGrad();
         _down.ZeroGrad();
+        _upOutput = null;
     }
 
     /// <summary>Returns all learnable parameters from both linear layers.</summary>
-    public IEnumerable<Tensor> Parameters() =>
+    public IEnumerable<Parameter> Parameters() =>
         _up.Parameters().Concat(_down.Parameters());
 }

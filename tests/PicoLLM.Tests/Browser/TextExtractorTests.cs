@@ -131,4 +131,14 @@ public class TextExtractorTests
         var (text, _, _) = TextExtractor.Extract(body);
         text.Should().Contain("Tom & Jerry <3");
     }
+
+    [Fact]
+    public async Task Extract_BlockAfterInlineText_HasDoubleNewlineBoundary()
+    {
+        var body = await GetBodyAsync("<span>Preamble</span><p>Paragraph</p>");
+        var (text, _, _) = TextExtractor.Extract(body);
+        var preambleIndex = text.IndexOf("Preamble");
+        var paraIndex = text.IndexOf("Paragraph");
+        text[preambleIndex..paraIndex].Should().Contain("\n\n");
+    }
 }

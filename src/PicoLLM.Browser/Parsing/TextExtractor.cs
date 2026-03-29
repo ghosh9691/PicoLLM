@@ -74,14 +74,14 @@ public static class TextExtractor
         bool isBlock = ElementFilter.IsBlock(tag);
         bool isHeading = ElementFilter.IsHeading(tag);
 
-        if (isBlock || isHeading) sb.Append('\n');
+        if (isBlock || isHeading) sb.Append("\n\n");
 
         if (isHeading) sb.Append(ElementFilter.HeadingPrefix(tag));
 
         foreach (var child in element.ChildNodes)
             Walk(child, sb, images, links);
 
-        if (isBlock || isHeading) sb.Append('\n');
+        if (isBlock || isHeading) sb.Append("\n\n");
     }
 
     private static bool IsValidHref(string href)

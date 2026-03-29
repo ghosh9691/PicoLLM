@@ -1,3 +1,4 @@
+using PicoLLM.Core.Compute;
 using PicoLLM.Core.Tensors;
 using PicoLLM.Core.Training;
 
@@ -33,6 +34,7 @@ public sealed class MultiHeadAttention : ILayer
     private Tensor? _kHeads;   // [B,H,S,D] after permute
     private Tensor? _vHeads;   // [B,H,S,D] after permute
     private Tensor? _attnWeights; // [B,H,S,S] after softmax
+    private readonly IComputeProvider? _computeProvider;
 
     /// <summary>Query projection [embed_dim, embed_dim].</summary>
     public LinearLayer QueryProj { get; }
@@ -52,7 +54,8 @@ public sealed class MultiHeadAttention : ILayer
     /// <param name="embedDim">Model hidden dimension. Must be divisible by numHeads.</param>
     /// <param name="numHeads">Number of attention heads.</param>
     /// <param name="seed">Optional random seed for weight initialization.</param>
-    public MultiHeadAttention(int embedDim, int numHeads, int? seed = null)
+    public MultiHeadAttention(int embedDim, int numHeads, int? seed = null,
+        IComputeProvider? computeProvider = null)
     {
         if (embedDim % numHeads != 0)
             throw new ArgumentException(
@@ -60,11 +63,12 @@ public sealed class MultiHeadAttention : ILayer
         _embedDim = embedDim;
         _numHeads = numHeads;
         _headDim  = embedDim / numHeads;
+        _computeProvider = computeProvider;
 
-        QueryProj  = new LinearLayer(embedDim, embedDim, useBias: true, seed: seed);
-        KeyProj    = new LinearLayer(embedDim, embedDim, useBias: true, seed: seed.HasValue ? seed + 1 : null);
-        ValueProj  = new LinearLayer(embedDim, embedDim, useBias: true, seed: seed.HasValue ? seed + 2 : null);
-        OutputProj = new LinearLayer(embedDim, embedDim, useBias: true, seed: seed.HasValue ? seed + 3 : null);
+        QueryProj  = new LinearLayer(embedDim, embedDim, useBias: true, seed: seed, computeProvider: computeProvider);
+        KeyProj    = new LinearLayer(embedDim, embedDim, useBias: true, seed: seed.HasValue ? seed + 1 : null, computeProvider: computeProvider);
+        ValueProj  = new LinearLayer(embedDim, embedDim, useBias: true, seed: seed.HasValue ? seed + 2 : null, computeProvider: computeProvider);
+        OutputProj = new LinearLayer(embedDim, embedDim, useBias: true, seed: seed.HasValue ? seed + 3 : null, computeProvider: computeProvider);
     }
 
     /// <summary>
@@ -98,7 +102,10 @@ public sealed class MultiHeadAttention : ILayer
 
         // 3. Scaled dot-product: Q @ K^T / sqrt(D)
         var kT = TensorMath.Transpose(k, 2, 3);
-        var scores = TensorMath.Multiply(TensorMath.BatchedMatMul(q, kT), 1f / MathF.Sqrt(D));
+        var rawScores = _computeProvider is not null
+            ? _computeProvider.BatchedMatMul(q, kT)
+            : TensorMath.BatchedMatMul(q, kT);
+        var scores = TensorMath.Multiply(rawScores, 1f / MathF.Sqrt(D));
 
         // 4. Causal mask
         scores = ApplyCausalMask(scores, B, H, S);
@@ -108,7 +115,9 @@ public sealed class MultiHeadAttention : ILayer
         _attnWeights = weights;
 
         // 6. Context: weights @ V → [B,H,S,D]
-        var context = TensorMath.BatchedMatMul(weights, v);
+        var context = _computeProvider is not null
+            ? _computeProvider.BatchedMatMul(weights, v)
+            : TensorMath.BatchedMatMul(weights, v);
 
         // 7. Permute(0,2,1,3) → [B,S,H,D] → reshape → [B,S,E]
         context = TensorMath.Reshape(TensorMath.Permute(context, [0, 2, 1, 3]), B, S, E);

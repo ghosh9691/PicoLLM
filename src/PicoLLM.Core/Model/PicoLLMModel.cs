@@ -1,3 +1,4 @@
+using PicoLLM.Core.Compute;
 using PicoLLM.Core.Layers;
 using PicoLLM.Core.Tensors;
 using PicoLLM.Core.Training;
@@ -46,7 +47,8 @@ public sealed class PicoLLMModel
     /// <summary>
     /// Initializes the model with the given configuration.
     /// </summary>
-    public PicoLLMModel(ModelConfig config, int? seed = null)
+    public PicoLLMModel(ModelConfig config, int? seed = null,
+        IComputeProvider? computeProvider = null)
     {
         Config = config;
 
@@ -57,7 +59,8 @@ public sealed class PicoLLMModel
         for (int i = 0; i < config.NumLayers; i++)
             _blocks[i] = new DecoderBlock(
                 config.EmbedDim, config.NumHeads, config.FfMultiplier,
-                seed: seed.HasValue ? seed + i * 10 : null);
+                seed: seed.HasValue ? seed + i * 10 : null,
+                computeProvider: computeProvider);
 
         _finalNorm = new LayerNorm(config.EmbedDim);
         _lmHead = new LinearLayer(

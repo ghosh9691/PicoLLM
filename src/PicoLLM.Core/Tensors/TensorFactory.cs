@@ -108,6 +108,19 @@ public static class TensorFactory
         return new Tensor(shape, copy);
     }
 
+    /// <summary>
+    /// Creates a tensor with the given shape backed by the provided data array.
+    /// The data is copied — the caller retains ownership of the original array.
+    /// </summary>
+    /// <param name="shape">Dimension sizes. Their product must equal <c>data.Length</c>.</param>
+    /// <param name="data">Float values in row-major order.</param>
+    public static Tensor FromData(int[] shape, float[] data)
+    {
+        ArgumentNullException.ThrowIfNull(shape);
+        ArgumentNullException.ThrowIfNull(data);
+        return new Tensor(shape, (float[])data.Clone());
+    }
+
     /// <summary>Creates a 1-D identity tensor with the given size (diagonal of 1s).</summary>
     public static Tensor Eye(int size)
     {

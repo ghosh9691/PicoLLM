@@ -1,0 +1,69 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:PicoLLM.App.ViewModels"
+             xmlns:m="using:PicoLLM.App.Models"
+             xmlns:v="using:PicoLLM.App.Views"
+             x:Class="PicoLLM.App.Views.BrowserPane"
+             Background="White">
+
+  <DockPanel>
+
+    <!-- Back / Forward bar -->
+    <Border DockPanel.Dock="Top"
+            Background="#F0F0F0" BorderBrush="#CCCCCC"
+            BorderThickness="0,0,0,1" Padding="6,4">
+      <DockPanel>
+        <Button Content="←" Width="32"
+                Command="{Binding GoBackCommand}"
+                IsEnabled="{Binding CanGoBack}"
+                Margin="0,0,4,0"/>
+        <Button Content="→" Width="32"
+                Command="{Binding GoForwardCommand}"
+                IsEnabled="{Binding CanGoForward}"
+                Margin="0,0,8,0"/>
+        <TextBlock Text="{Binding AddressBarUrl}"
+                   FontSize="11" Foreground="#777777"
+                   VerticalAlignment="Center"
+                   TextTrimming="CharacterEllipsis"/>
+      </DockPanel>
+    </Border>
+
+    <!-- Page content -->
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled"
+                  VerticalScrollBarVisibility="Auto">
+      <ItemsControl ItemsSource="{Binding CurrentPage.Elements}"
+                    Margin="16,12">
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate>
+            <StackPanel Orientation="Vertical"/>
+          </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.DataTemplates>
+
+          <!-- HeadingElement template -->
+          <DataTemplate DataType="m:HeadingElement">
+            <v:HeadingView/>
+          </DataTemplate>
+
+          <!-- ParagraphElement template -->
+          <DataTemplate DataType="m:ParagraphElement">
+            <v:ParagraphView Runs="{Binding Runs}" Margin="0,0,0,8"/>
+          </DataTemplate>
+
+          <!-- ImageAltElement template -->
+          <DataTemplate DataType="m:ImageAltElement">
+            <Border Background="#F7F7F7" Padding="8,4" Margin="0,4,0,8"
+                    BorderBrush="#CCCCCC" BorderThickness="3,0,0,0"
+                    CornerRadius="2">
+              <TextBlock Text="{Binding AltText, StringFormat='[Image: {0}]'}"
+                         FontStyle="Italic" FontSize="12"
+                         Foreground="#555555" TextWrapping="Wrap"/>
+            </Border>
+          </DataTemplate>
+
+        </ItemsControl.DataTemplates>
+      </ItemsControl>
+    </ScrollViewer>
+
+  </DockPanel>
+</UserControl>

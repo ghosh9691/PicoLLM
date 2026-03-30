@@ -7,5 +7,5 @@ namespace PicoLLM.App;
 public partial class MainWindow : Window
 {
     /// <summary>Initializes the main window.</summary>
-    public MainWindow() => AvaloniaXamlLoader.Load(this);
+    public MainWindow() => InitializeComponent();
 }

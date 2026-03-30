@@ -1,0 +1,17 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="PicoLLM.App.Views.ModelInfoPanel">
+  <Border Background="#1E1E1E" Padding="10" CornerRadius="4">
+    <StackPanel>
+      <TextBlock Text="MODEL INFO" FontSize="10" Foreground="#888888"
+                 FontWeight="SemiBold"
+                 LetterSpacing="1" Margin="0,0,0,8"/>
+      <TextBlock Text="{Binding ModelInfo}"
+                 FontSize="11" Foreground="#CCCCCC" TextWrapping="Wrap"
+                 LineHeight="18"/>
+      <TextBlock Text="{Binding GpuStatus}"
+                 FontSize="11" Foreground="#6BFF9E"
+                 Margin="0,4,0,0"/>
+    </StackPanel>
+  </Border>
+</UserControl>

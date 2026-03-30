@@ -1,0 +1,79 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:v="using:PicoLLM.App.Views"
+             x:Class="PicoLLM.App.Views.DashboardPanel"
+             Background="#121212">
+  <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <StackPanel Margin="10" Spacing="10">
+
+      <!-- Metrics grid -->
+      <Border Background="#1E1E1E" Padding="10" CornerRadius="4">
+        <StackPanel>
+          <TextBlock Text="TRAINING METRICS" FontSize="10" Foreground="#888888"
+                     FontWeight="SemiBold"
+                     LetterSpacing="1" Margin="0,0,0,10"/>
+          <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto">
+
+            <!-- Loss -->
+            <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,0,8">
+              <TextBlock Text="Loss" FontSize="10" Foreground="#888888"/>
+              <TextBlock Text="{Binding Loss, StringFormat={}{0:F3}}"
+                         FontSize="18" FontWeight="Bold" Foreground="#FF6B6B"/>
+            </StackPanel>
+
+            <!-- LR -->
+            <StackPanel Grid.Row="0" Grid.Column="1" Margin="0,0,0,8">
+              <TextBlock Text="LR" FontSize="10" Foreground="#888888"/>
+              <TextBlock Text="{Binding LearningRate, StringFormat={}{0:F6}}"
+                         FontSize="18" FontWeight="Bold" Foreground="#6BA3FF"/>
+            </StackPanel>
+
+            <!-- Tokens/s -->
+            <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,0,0,8">
+              <TextBlock Text="Tokens/s" FontSize="10" Foreground="#888888"/>
+              <TextBlock Text="{Binding TokensPerSec, StringFormat={}{0:N0}}"
+                         FontSize="18" FontWeight="Bold" Foreground="#6BFF9E"/>
+            </StackPanel>
+
+            <!-- Grad Norm -->
+            <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,0,0,8">
+              <TextBlock Text="&#x2016;&#x2207;&#x2016;" FontSize="10" Foreground="#888888"/>
+              <TextBlock Text="{Binding GradNorm, StringFormat={}{0:F3}}"
+                         FontSize="18" FontWeight="Bold" Foreground="#FFD06B"/>
+            </StackPanel>
+
+            <!-- Step -->
+            <StackPanel Grid.Row="2" Grid.Column="0">
+              <TextBlock Text="Step" FontSize="10" Foreground="#888888"/>
+              <TextBlock Text="{Binding Step}"
+                         FontSize="14" FontWeight="Bold" Foreground="#E8E8E8"/>
+            </StackPanel>
+
+            <!-- Pages -->
+            <StackPanel Grid.Row="2" Grid.Column="1">
+              <TextBlock Text="Pages" FontSize="10" Foreground="#888888"/>
+              <TextBlock Text="{Binding PagesProcessed}"
+                         FontSize="14" FontWeight="Bold" Foreground="#E8E8E8"/>
+            </StackPanel>
+
+          </Grid>
+        </StackPanel>
+      </Border>
+
+      <!-- Loss chart -->
+      <Border Background="#1E1E1E" Padding="10" CornerRadius="4">
+        <StackPanel>
+          <TextBlock Text="LOSS CHART" FontSize="10" Foreground="#888888"
+                     FontWeight="SemiBold"
+                     LetterSpacing="1" Margin="0,0,0,6"/>
+          <v:LossChartControl Height="100"
+                              LossHistory="{Binding LossHistory}"/>
+        </StackPanel>
+      </Border>
+
+      <!-- Model info -->
+      <v:ModelInfoPanel/>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

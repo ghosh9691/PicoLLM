@@ -6,6 +6,7 @@
     <Project Path="src/PicoLLM.Tokenizer/PicoLLM.Tokenizer.csproj" />
     <Project Path="src/PicoLLM.Training/PicoLLM.Training.csproj" />
     <Project Path="src/PicoLLM.Browser/PicoLLM.Browser.csproj" />
+    <Project Path="src/PicoLLM.App/PicoLLM.App.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/PicoLLM.Tests/PicoLLM.Tests.csproj" />

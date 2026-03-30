@@ -1,0 +1,91 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:PicoLLM.App.ViewModels"
+        x:Class="PicoLLM.App.Views.SettingsPanel"
+        Title="Session Settings"
+        Width="480" Height="540"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner">
+
+  <ScrollViewer>
+    <StackPanel Margin="20" Spacing="16">
+
+      <!-- Data directory -->
+      <StackPanel Spacing="6">
+        <TextBlock Text="DATA DIRECTORY" FontSize="10" Foreground="#888888"
+                   FontWeight="SemiBold" LetterSpacing="1"/>
+        <DockPanel>
+          <Button Content="Browse…" DockPanel.Dock="Right"
+                  Click="OnBrowseClick" Margin="8,0,0,0"/>
+          <TextBox Text="{Binding DataDirectory}" FontSize="12"/>
+        </DockPanel>
+        <TextBlock Text="Tokenizer, checkpoints, and GGUF files are saved here."
+                   FontSize="10" Foreground="#888888"/>
+      </StackPanel>
+
+      <!-- Model hyperparameters -->
+      <StackPanel Spacing="6">
+        <TextBlock Text="MODEL HYPERPARAMETERS" FontSize="10" Foreground="#888888"
+                   FontWeight="SemiBold" LetterSpacing="1"/>
+        <Grid ColumnDefinitions="*,20,*" RowDefinitions="Auto,Auto,Auto">
+          <StackPanel Grid.Row="0" Grid.Column="0" Spacing="3" Margin="0,0,0,8">
+            <TextBlock Text="Vocab Size" FontSize="11" Foreground="#777777"/>
+            <NumericUpDown Value="{Binding VocabSize}" Minimum="260" Maximum="32000" Increment="256"/>
+          </StackPanel>
+          <StackPanel Grid.Row="0" Grid.Column="2" Spacing="3" Margin="0,0,0,8">
+            <TextBlock Text="Embed Dim" FontSize="11" Foreground="#777777"/>
+            <NumericUpDown Value="{Binding EmbedDim}" Minimum="32" Maximum="1024" Increment="32"/>
+          </StackPanel>
+          <StackPanel Grid.Row="1" Grid.Column="0" Spacing="3" Margin="0,0,0,8">
+            <TextBlock Text="Layers" FontSize="11" Foreground="#777777"/>
+            <NumericUpDown Value="{Binding NumLayers}" Minimum="1" Maximum="24" Increment="1"/>
+          </StackPanel>
+          <StackPanel Grid.Row="1" Grid.Column="2" Spacing="3" Margin="0,0,0,8">
+            <TextBlock Text="Heads" FontSize="11" Foreground="#777777"/>
+            <NumericUpDown Value="{Binding NumHeads}" Minimum="1" Maximum="16" Increment="1"/>
+          </StackPanel>
+          <StackPanel Grid.Row="2" Grid.Column="0" Spacing="3" Margin="0,0,0,8">
+            <TextBlock Text="Context Length" FontSize="11" Foreground="#777777"/>
+            <NumericUpDown Value="{Binding MaxSeqLen}" Minimum="64" Maximum="4096" Increment="64"/>
+          </StackPanel>
+          <StackPanel Grid.Row="2" Grid.Column="2" Spacing="3" Margin="0,0,0,8">
+            <TextBlock Text="Steps / Page" FontSize="11" Foreground="#777777"/>
+            <NumericUpDown Value="{Binding StepsPerPage}" Minimum="1" Maximum="10000" Increment="10"/>
+          </StackPanel>
+        </Grid>
+      </StackPanel>
+
+      <!-- Training hyperparameters -->
+      <StackPanel Spacing="6">
+        <TextBlock Text="TRAINING HYPERPARAMETERS" FontSize="10" Foreground="#888888"
+                   FontWeight="SemiBold" LetterSpacing="1"/>
+        <Grid ColumnDefinitions="*,20,*" RowDefinitions="Auto,Auto">
+          <StackPanel Grid.Row="0" Grid.Column="0" Spacing="3" Margin="0,0,0,8">
+            <TextBlock Text="Learning Rate" FontSize="11" Foreground="#777777"/>
+            <TextBox Text="{Binding LearningRate, StringFormat={}{0:F6}}" FontSize="12"/>
+          </StackPanel>
+          <StackPanel Grid.Row="0" Grid.Column="2" Spacing="3" Margin="0,0,0,8">
+            <TextBlock Text="Batch Size" FontSize="11" Foreground="#777777"/>
+            <NumericUpDown Value="{Binding BatchSize}" Minimum="1" Maximum="64" Increment="1"/>
+          </StackPanel>
+          <StackPanel Grid.Row="1" Grid.Column="0" Spacing="3">
+            <TextBlock Text="Sequence Length" FontSize="11" Foreground="#777777"/>
+            <NumericUpDown Value="{Binding SeqLen}" Minimum="16" Maximum="2048" Increment="16"/>
+          </StackPanel>
+          <StackPanel Grid.Row="1" Grid.Column="2" Spacing="3">
+            <TextBlock Text="Warmup Steps" FontSize="11" Foreground="#777777"/>
+            <NumericUpDown Value="{Binding WarmupSteps}" Minimum="0" Maximum="1000" Increment="10"/>
+          </StackPanel>
+        </Grid>
+      </StackPanel>
+
+      <!-- Action buttons -->
+      <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+        <Button Content="Cancel" Click="OnCancelClick" MinWidth="80"/>
+        <Button Content="Save &amp; Start Session" Click="OnSaveClick"
+                Classes="accent" MinWidth="160"/>
+      </StackPanel>
+
+    </StackPanel>
+  </ScrollViewer>
+</Window>

@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../PicoLLM.Core/PicoLLM.Core.csproj" />
+    <ProjectReference Include="../PicoLLM.Tokenizer/PicoLLM.Tokenizer.csproj" />
+    <ProjectReference Include="../PicoLLM.Training/PicoLLM.Training.csproj" />
+    <ProjectReference Include="../PicoLLM.Browser/PicoLLM.Browser.csproj" />
+    <ProjectReference Include="../PicoLLM.Gguf/PicoLLM.Gguf.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -26,6 +26,7 @@
     <ProjectReference Include="..\..\src\PicoLLM.Browser\PicoLLM.Browser.csproj" />
     <ProjectReference Include="..\..\src\PicoLLM.Gguf\PicoLLM.Gguf.csproj" />
     <ProjectReference Include="..\..\src\PicoLLM.Gpu\PicoLLM.Gpu.csproj" />
+    <ProjectReference Include="..\..\src\PicoLLM.App\PicoLLM.App.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,8 +1,76 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:PicoLLM.App.ViewModels"
+        xmlns:v="using:PicoLLM.App.Views"
         x:Class="PicoLLM.App.MainWindow"
+        x:DataType="vm:MainViewModel"
         Title="PicoLLM"
         Width="1100" Height="700"
         MinWidth="800" MinHeight="500">
-  <TextBlock Text="PicoLLM — loading…" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+  <DockPanel>
+
+    <!-- Address bar -->
+    <Border DockPanel.Dock="Top"
+            Background="#F5F5F5" BorderBrush="#DDDDDD"
+            BorderThickness="0,0,0,1" Padding="8,6">
+      <DockPanel>
+        <Button Content="Stop" DockPanel.Dock="Right"
+                Command="{Binding StopNavigationCommand}"
+                Margin="4,0,0,0" MinWidth="50"/>
+        <Button Content="Go" DockPanel.Dock="Right"
+                Click="OnGoClick"
+                Margin="4,0,0,0" MinWidth="40"/>
+        <TextBox x:Name="AddressBox"
+                 Text="{Binding AddressBarUrl}"
+                 FontSize="13"
+                 KeyDown="OnAddressKeyDown"
+                 Watermark="Enter URL…"
+                 VerticalContentAlignment="Center"/>
+      </DockPanel>
+    </Border>
+
+    <!-- Status bar + session buttons -->
+    <Border DockPanel.Dock="Bottom"
+            Background="#1A1A1A" Padding="10,6"
+            BorderBrush="#333333" BorderThickness="0,1,0,0">
+      <DockPanel>
+        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="8">
+          <Button Content="Start Session"
+                  Click="OnStartSessionClick"
+                  IsEnabled="{Binding !IsSessionActive}"
+                  Classes="accent"/>
+          <Button Content="End Session &amp; Export GGUF"
+                  Click="OnEndSessionClick"
+                  IsEnabled="{Binding IsSessionActive}"/>
+        </StackPanel>
+        <TextBlock Text="{Binding StatusText}"
+                   Foreground="#AAAAAA" FontSize="11"
+                   VerticalAlignment="Center"/>
+      </DockPanel>
+    </Border>
+
+    <!-- Main split: browser (left) | dashboard (right) -->
+    <Grid>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="3*"/>
+        <ColumnDefinition Width="4"/>
+        <ColumnDefinition Width="2*"/>
+      </Grid.ColumnDefinitions>
+
+      <!-- Browser pane -->
+      <v:BrowserPane Grid.Column="0"/>
+
+      <!-- Splitter -->
+      <GridSplitter Grid.Column="1"
+                    ResizeBehavior="PreviousAndNext"
+                    ResizeDirection="Columns"
+                    Background="#333333"/>
+
+      <!-- Dashboard -->
+      <v:DashboardPanel Grid.Column="2"/>
+
+    </Grid>
+
+  </DockPanel>
 </Window>

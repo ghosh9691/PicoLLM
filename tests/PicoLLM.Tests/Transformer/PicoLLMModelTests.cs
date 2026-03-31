@@ -42,25 +42,26 @@ public class PicoLLMModelTests
     [Fact]
     public void TotalParameters_KnownConfig_CorrectCount()
     {
-        // vocab=512, embed=64, heads=4, layers=2, ff_mult=4
+        // vocab=512, embed=64, heads=4, layers=2, ff_mult=4  (SwiGLU, no bias in FFN)
         //
-        // Token embedding:       512 × 64              = 32 768
+        // Token embedding:       512 × 64              =  32 768
         //
         // Per decoder block:
-        //   attn LayerNorm:       64 + 64              =    128  (gamma + beta)
-        //   MHA 4 projections:    4 × (64×64 + 64)     = 16 640  (weights + bias each)
-        //   ffn LayerNorm:        64 + 64              =    128
-        //   FFN up:               64×256 + 256         = 16 640
-        //   FFN down:             256×64 + 64          = 16 448
-        //   Block total:          128 + 16 640 + 128 + 16 640 + 16 448 = 49 984
+        //   attn LayerNorm:       64 + 64              =     128  (gamma + beta)
+        //   MHA 4 projections:    4 × (64×64 + 64)     =  16 640  (weights + bias each)
+        //   ffn LayerNorm:        64 + 64              =     128
+        //   FFN gate:             64×256               =  16 384  (no bias)
+        //   FFN up:               64×256               =  16 384  (no bias)
+        //   FFN down:             256×64               =  16 384  (no bias)
+        //   Block total:          128 + 16 640 + 128 + 16 384 + 16 384 + 16 384 = 66 048
         //
-        // 2 blocks:              2 × 49 984            = 99 968
-        // Final LayerNorm:        64 + 64              =    128
-        // LM head:                64×512 + 512         = 33 280
+        // 2 blocks:              2 × 66 048            = 132 096
+        // Final LayerNorm:        64 + 64              =     128
+        // LM head:                64×512 + 512         =  33 280
         //
-        // Grand total: 32 768 + 99 968 + 128 + 33 280 = 166 144
+        // Grand total: 32 768 + 132 096 + 128 + 33 280 = 198 272
         var model = new PicoLLMModel(SmallConfig(), seed: 1);
-        model.TotalParameters().Should().Be(166_144);
+        model.TotalParameters().Should().Be(198_272);
     }
 
     [Fact]

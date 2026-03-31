@@ -44,9 +44,9 @@ public class DecoderBlockTests
         //   attn LayerNorm: 2 (gamma, beta)
         //   MHA: 4 projections × 2 (weights+bias) = 8
         //   ffn LayerNorm: 2
-        //   FFN: 2 linears × 2 = 4
-        //   total = 16
+        //   FFN (SwiGLU): 3 unbiased weight-only linears = 3
+        //   total = 15
         var block = new DecoderBlock(embedDim: 16, numHeads: 4, ffMultiplier: 4, seed: 1);
-        block.Parameters().Should().HaveCount(16);
+        block.Parameters().Should().HaveCount(15);
     }
 }

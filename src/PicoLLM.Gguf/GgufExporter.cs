@@ -61,6 +61,7 @@ public static class GgufExporter
             result.Add(($"blk.{i}.attn_v.weight",      block.Attention.ValueProj.Weights));
             result.Add(($"blk.{i}.attn_output.weight", block.Attention.OutputProj.Weights));
             result.Add(($"blk.{i}.ffn_norm.weight",    block.FfnNorm.Gamma));
+            result.Add(($"blk.{i}.ffn_gate.weight",    block.FFN.Gate.Weights));
             result.Add(($"blk.{i}.ffn_up.weight",      block.FFN.Up.Weights));
             result.Add(($"blk.{i}.ffn_down.weight",    block.FFN.Down.Weights));
         }
@@ -111,9 +112,11 @@ public static class GgufExporter
         writer.WriteMetadataFloat32(GgufConstants.KeyLayerNormEps,     1e-5f);
 
         var (tokens, tokenTypes) = tokenizer.GetVocabRepresentations();
+        var merges = tokenizer.GetMergeRepresentations();
         writer.WriteMetadataString(GgufConstants.KeyTokenizerModel, "gpt2");
         writer.WriteMetadataStringArray(GgufConstants.KeyTokenizerTokens, tokens);
         writer.WriteMetadataInt32Array(GgufConstants.KeyTokenizerTypes,  tokenTypes);
+        writer.WriteMetadataStringArray(GgufConstants.KeyTokenizerMerges, merges);
         writer.WriteMetadataUint32(GgufConstants.KeyBosTokenId, (uint)BpeTokenizer.BosId);
         writer.WriteMetadataUint32(GgufConstants.KeyEosTokenId, (uint)BpeTokenizer.EosId);
         writer.WriteMetadataUint32(GgufConstants.KeyPadTokenId, (uint)BpeTokenizer.PadId);
@@ -129,7 +132,14 @@ public static class GgufExporter
         for (int i = 0; i < tensors.Count; i++)
         {
             var (name, tensor) = tensors[i];
-            writer.WriteTensorInfo(name, tensor.GetShape(), GgufDataType.F32, offsets[i]);
+            // ggml convention: ne[0] is the innermost (fastest-varying) dimension.
+            // token_embd.weight is stored [vocab_size × embed_dim] in PicoLLM but
+            // llama.cpp loads it as {n_embd, n_vocab} = {embed_dim, vocab_size},
+            // so we must reverse the declared shape. Data bytes are identical either way.
+            var shape = name == "token_embd.weight"
+                ? tensor.GetShape().Reverse().ToArray()
+                : tensor.GetShape();
+            writer.WriteTensorInfo(name, shape, GgufDataType.F32, offsets[i]);
         }
     }
 

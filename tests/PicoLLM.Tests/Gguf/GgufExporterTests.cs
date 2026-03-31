@@ -79,8 +79,8 @@ public class GgufExporterTests : IDisposable
 
         var bytes = File.ReadAllBytes(_tempFile);
         ulong tensorCount = BitConverter.ToUInt64(bytes, 8);
-        // 2 layers × 8 tensors + 3 (token_embd + output_norm + output) = 19
-        tensorCount.Should().Be(19UL);
+        // 2 layers × 9 tensors (+ ffn_gate.weight) + 3 (token_embd + output_norm + output) = 21
+        tensorCount.Should().Be(21UL);
     }
 
     [Fact]

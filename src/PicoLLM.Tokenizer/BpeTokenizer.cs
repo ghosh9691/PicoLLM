@@ -168,20 +168,27 @@ public sealed class BpeTokenizer
         tokens[EosId] = "<|eos|>"; types[EosId] = 3;
 
         // Byte tokens: IDs 4-259 (ByteOffset + 0..255)
+        // Use the GPT-2 byte-to-unicode mapping so that llama.cpp's gpt2 tokenizer
+        // can match its internal byte-to-unicode lookups against our vocabulary.
         for (int b = 0; b < 256; b++)
         {
             int id = b + ByteOffset;
-            tokens[id] = $"<0x{b:X2}>";
+            tokens[id] = GptByteToUnicodeString((byte)b);
             types[id]  = 6;
         }
 
-        // Merged tokens: IDs 260+ — decode byte sequence as UTF-8 (best effort)
+        // Merged tokens: IDs 260+
+        // Represent each merged token as the concatenation of GPT-2 byte-to-unicode
+        // chars for each byte in the token's byte sequence. This mapping is a bijection
+        // (every byte → unique char), so different byte sequences always produce
+        // different strings — satisfying llama.cpp's no-duplicate-token assertion.
         for (int id = ByteOffset + 256; id < _vocabSize; id++)
         {
             if (_vocab.TryGetValue(id, out var bytes) && bytes.Length > 0)
             {
-                try   { tokens[id] = System.Text.Encoding.UTF8.GetString(bytes); }
-                catch { tokens[id] = $"<token_{id}>"; }
+                var sb = new System.Text.StringBuilder(bytes.Length);
+                foreach (var b in bytes) sb.Append(GptByteToUnicodeString(b));
+                tokens[id] = sb.ToString();
             }
             else
             {
@@ -191,6 +198,24 @@ public sealed class BpeTokenizer
         }
 
         return (tokens, types);
+    }
+
+    /// <summary>
+    /// Returns the BPE merge rules as GGUF-format strings.
+    /// Each entry is "left_token_str right_token_str" using the same string representations
+    /// produced by <see cref="GetVocabRepresentations"/>. Used by the GGUF exporter to
+    /// write the <c>tokenizer.ggml.merges</c> metadata key required by llama.cpp.
+    /// </summary>
+    public string[] GetMergeRepresentations()
+    {
+        var (tokens, _) = GetVocabRepresentations();
+        var result = new string[_mergeRules.Count];
+        for (int i = 0; i < _mergeRules.Count; i++)
+        {
+            var (left, right) = _mergeRules[i];
+            result[i] = $"{tokens[left]} {tokens[right]}";
+        }
+        return result;
     }
 
     // ── Persistence ──────────────────────────────────────────────────────────
@@ -217,6 +242,31 @@ public sealed class BpeTokenizer
     }
 
     // ── Private helpers ──────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Maps a byte value to its GPT-2 byte-to-unicode single-character string.
+    /// Printable ASCII (33–126) and printable Latin-1 (161–172, 174–255) map to the
+    /// same Unicode code point (i.e. the character itself). The 68 remaining
+    /// non-printable bytes (0–32, 127, 128–160, 173) map to U+0100–U+0143 in their
+    /// natural sort order, matching the Python GPT-2 reference implementation.
+    /// </summary>
+    private static string GptByteToUnicodeString(byte b)
+    {
+        // Printable ranges: 33-126, 161-172, 174-255 → identity mapping
+        if ((b >= 33 && b <= 126) || (b >= 161 && b <= 172) || b >= 174)
+            return ((char)b).ToString();
+
+        // Non-printable: compute index in sorted list [0-32, 127, 128-160, 173]
+        //   0-32   → n = 0-32  (33 values)
+        //   127    → n = 33
+        //   128-160 → n = 34-66  (33 values, formula: b - 94)
+        //   173    → n = 67
+        int n = b <= 32  ? b :
+                b == 127 ? 33 :
+                b <= 160 ? b - 94 :
+                           67; // 173
+        return ((char)(256 + n)).ToString();
+    }
 
     private void ApplyMerges(List<int> tokens)
     {

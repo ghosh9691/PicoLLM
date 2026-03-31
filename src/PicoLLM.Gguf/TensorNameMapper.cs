@@ -17,6 +17,7 @@ public static class TensorNameMapper
         ["Attention.ValueProj.Weights"]  = "attn_v.weight",
         ["Attention.OutputProj.Weights"] = "attn_output.weight",
         ["FfnNorm.Gamma"]                = "ffn_norm.weight",
+        ["FFN.Gate.Weights"]             = "ffn_gate.weight",
         ["FFN.Up.Weights"]               = "ffn_up.weight",
         ["FFN.Down.Weights"]             = "ffn_down.weight",
     };

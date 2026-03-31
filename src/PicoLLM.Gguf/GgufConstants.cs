@@ -71,10 +71,11 @@ public static class GgufConstants
     public const string KeyTokenizerModel    = "tokenizer.ggml.model";
     public const string KeyTokenizerTokens   = "tokenizer.ggml.tokens";
     public const string KeyTokenizerTypes    = "tokenizer.ggml.token_type";
+    public const string KeyTokenizerMerges   = "tokenizer.ggml.merges";
     public const string KeyBosTokenId        = "tokenizer.ggml.bos_token_id";
     public const string KeyEosTokenId        = "tokenizer.ggml.eos_token_id";
     public const string KeyPadTokenId        = "tokenizer.ggml.padding_token_id";
 
     /// <summary>Total number of metadata KV pairs written by GgufExporter.</summary>
-    public const int MetadataKvCount = 17;
+    public const int MetadataKvCount = 18;
 }

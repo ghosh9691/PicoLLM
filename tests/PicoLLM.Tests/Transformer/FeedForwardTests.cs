@@ -41,10 +41,10 @@ public class FeedForwardTests
     }
 
     [Fact]
-    public void Parameters_ReturnsFourTensors_TwoWeightsTwoBiases()
+    public void Parameters_ReturnsThreeWeightTensors()
     {
-        // _up has weights+bias, _down has weights+bias = 4 total
+        // SwiGLU: _gate + _up + _down, each weights-only (no bias) = 3 total
         var ffn = new FeedForward(embedDim: 8, ffMultiplier: 4, seed: 1);
-        ffn.Parameters().Should().HaveCount(4);
+        ffn.Parameters().Should().HaveCount(3);
     }
 }

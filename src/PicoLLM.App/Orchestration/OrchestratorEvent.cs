@@ -1,3 +1,5 @@
+using PicoLLM.Browser.Parsing;
+
 namespace PicoLLM.App.Orchestration;
 
 /// <summary>Base class for all orchestrator pipeline events.</summary>
@@ -15,7 +17,8 @@ public record PageFetchedEvent(string Url, bool Success, string? Error)
 /// <param name="TextLength">Length of extracted clean text in characters.</param>
 /// <param name="ImageCount">Number of image references extracted.</param>
 /// <param name="LinkCount">Number of link references extracted.</param>
-public record PageParsedEvent(string Url, int TextLength, int ImageCount, int LinkCount)
+/// <param name="Page">The fully parsed page including clean text, links, and images.</param>
+public record PageParsedEvent(string Url, int TextLength, int ImageCount, int LinkCount, ParsedPage Page)
     : OrchestratorEvent(DateTime.UtcNow);
 
 /// <summary>Emitted when a BPE tokenizer has been trained from the first session corpus.</summary>
@@ -47,4 +50,9 @@ public record GgufExportedEvent(string Path, long FileSizeBytes)
 /// <param name="Url">The URL that failed.</param>
 /// <param name="Error">Human-readable error description.</param>
 public record SessionErrorEvent(string Url, string Error)
+    : OrchestratorEvent(DateTime.UtcNow);
+
+/// <summary>Emitted when the background training queue depth changes (page added or training started).</summary>
+/// <param name="QueueDepth">Number of pages currently waiting to be trained.</param>
+public record TrainingQueueChangedEvent(int QueueDepth)
     : OrchestratorEvent(DateTime.UtcNow);

@@ -5,6 +5,7 @@ using Avalonia.Media;
 using Avalonia.VisualTree;
 using PicoLLM.App.Models;
 using PicoLLM.App.ViewModels;
+using PicoLLM.Browser;
 
 namespace PicoLLM.App.Views;
 
@@ -71,9 +72,25 @@ public class ParagraphView : WrapPanel
 
     private void OnLinkClicked(string href)
     {
-        // Walk up the visual tree to find MainViewModel
-        var vm = this.FindAncestorOfType<Control>()?.DataContext as MainViewModel
-              ?? DataContext as MainViewModel;
-        vm?.NavigateCommand.Execute(href);
+        // Walk the full visual tree upward until we find a control whose DataContext
+        // is MainViewModel. Item containers have ParagraphElement as their DataContext,
+        // so we cannot stop at the first ancestor — we must keep going.
+        Control? current = this;
+        MainViewModel? vm = null;
+        while (current is not null)
+        {
+            if (current.DataContext is MainViewModel found)
+            {
+                vm = found;
+                break;
+            }
+            current = current.GetVisualParent() as Control;
+        }
+
+        if (vm is null) return;
+
+        // Resolve relative hrefs against the current page URL.
+        var absoluteUrl = UrlResolver.Resolve(vm.AddressBarUrl, href) ?? href;
+        vm.NavigateCommand.Execute(absoluteUrl);
     }
 }

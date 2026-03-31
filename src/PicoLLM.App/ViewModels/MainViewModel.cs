@@ -3,6 +3,8 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using PicoLLM.App.Models;
 using PicoLLM.App.Orchestration;
+using PicoLLM.Browser;
+using PicoLLM.Browser.Parsing;
 
 namespace PicoLLM.App.ViewModels;
 
@@ -26,6 +28,9 @@ public partial class MainViewModel : ObservableObject
     // ── Orchestrator ──────────────────────────────────────────────────────────
     private PicoOrchestrator? _orchestrator;
     private CancellationTokenSource? _cts;
+
+    // Shared fetcher for standalone browsing (when no training session is active).
+    private readonly HttpFetcher _httpFetcher = new();
 
     // ── Observable properties ─────────────────────────────────────────────────
 
@@ -77,6 +82,9 @@ public partial class MainViewModel : ObservableObject
     /// <summary>GPU name or "CPU only".</summary>
     [ObservableProperty] private string _gpuStatus = "—";
 
+    /// <summary>Number of pages currently waiting in the background training queue.</summary>
+    [ObservableProperty] private int _trainingQueueDepth;
+
     /// <summary>Loss values for the chart — last 500 points.</summary>
     public ObservableCollection<float> LossHistory { get; } = new();
 
@@ -110,6 +118,13 @@ public partial class MainViewModel : ObservableObject
     {
         if (string.IsNullOrWhiteSpace(url)) return;
 
+        // Prepend https:// when no scheme is present
+        if (!url.StartsWith("http://", StringComparison.OrdinalIgnoreCase) &&
+            !url.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+        {
+            url = "https://" + url;
+        }
+
         // Push current to back stack before navigating
         if (_currentUrl is not null)
         {
@@ -126,24 +141,12 @@ public partial class MainViewModel : ObservableObject
             CanGoForward = _fwdStack.Count > 0;
         });
 
-        if (_orchestrator is null) return; // no session yet — navigation history still tracked
-
-        _dispatch(() => StatusText = $"Fetching {url}…");
-        try
-        {
-            _cts ??= new CancellationTokenSource();
-            await _orchestrator.ProcessUrlAsync(url, _cts.Token).ConfigureAwait(false);
-        }
-        catch (OperationCanceledException) { }
-        catch (Exception ex)
-        {
-            _dispatch(() => StatusText = $"Error: {ex.Message}");
-        }
+        await FetchAndRenderAsync(url).ConfigureAwait(false);
     }
 
     /// <summary>Navigate to the previous page.</summary>
     [RelayCommand(CanExecute = nameof(CanGoBack))]
-    private void GoBack()
+    private async Task GoBackAsync()
     {
         if (_backStack.Count == 0) return;
         if (_currentUrl is not null) _fwdStack.Push(_currentUrl);
@@ -154,11 +157,12 @@ public partial class MainViewModel : ObservableObject
             CanGoBack = _backStack.Count > 0;
             CanGoForward = _fwdStack.Count > 0;
         });
+        await FetchAndRenderAsync(_currentUrl).ConfigureAwait(false);
     }
 
     /// <summary>Navigate forward (after going back).</summary>
     [RelayCommand(CanExecute = nameof(CanGoForward))]
-    private void GoForward()
+    private async Task GoForwardAsync()
     {
         if (_fwdStack.Count == 0) return;
         if (_currentUrl is not null) _backStack.Push(_currentUrl);
@@ -169,6 +173,53 @@ public partial class MainViewModel : ObservableObject
             CanGoBack = _backStack.Count > 0;
             CanGoForward = _fwdStack.Count > 0;
         });
+        await FetchAndRenderAsync(_currentUrl).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Fetches and renders a URL in the browser pane. Uses the orchestrator when a
+    /// training session is active; falls back to a standalone fetch otherwise.
+    /// Does NOT manipulate the navigation stacks.
+    /// </summary>
+    private async Task FetchAndRenderAsync(string url)
+    {
+        _dispatch(() => StatusText = $"Fetching {url}…");
+        _cts ??= new CancellationTokenSource();
+        try
+        {
+            if (_orchestrator is not null)
+            {
+                // Session active: orchestrator handles fetch + parse + training pipeline.
+                await _orchestrator.BrowseAsync(url, _cts.Token).ConfigureAwait(false);
+            }
+            else
+            {
+                // No session: fetch and render without training.
+                var result = await _httpFetcher.FetchAsync(url, _cts.Token).ConfigureAwait(false);
+                bool success = result.Status is BrowseStatus.Success or BrowseStatus.Redirect;
+                if (success && !string.IsNullOrWhiteSpace(result.HtmlContent))
+                {
+                    var page = await HtmlParser
+                        .ParseAsync(result.HtmlContent, url, _cts.Token)
+                        .ConfigureAwait(false);
+                    var content = FormattedPageContentBuilder.Build(page, _visitedUrls);
+                    _dispatch(() =>
+                    {
+                        CurrentPage = content;
+                        StatusText = $"Loaded {url}";
+                    });
+                }
+                else
+                {
+                    _dispatch(() => StatusText = $"Failed to load {url}: {result.ErrorMessage}");
+                }
+            }
+        }
+        catch (OperationCanceledException) { }
+        catch (Exception ex)
+        {
+            _dispatch(() => StatusText = $"Error: {ex.Message}");
+        }
     }
 
     /// <summary>Cancels the current in-flight fetch or training step.</summary>
@@ -186,11 +237,14 @@ public partial class MainViewModel : ObservableObject
     /// Initialises the orchestrator with current settings. Call after the settings
     /// dialog has been confirmed by the user.
     /// </summary>
-    public void StartSession()
+    /// <param name="httpOverride">
+    /// Optional HTTP fetcher override — pass a fake in tests to avoid real network calls.
+    /// </param>
+    public void StartSession(Func<string, CancellationToken, Task<BrowseResult>>? httpOverride = null)
     {
         Settings.Save();
         var config = Settings.ToOrchestratorConfig();
-        _orchestrator = new PicoOrchestrator(config);
+        _orchestrator = new PicoOrchestrator(config, httpOverride);
         _orchestrator.OnProgress += OnOrchestratorProgress;
         _cts = new CancellationTokenSource();
         _dispatch(() =>
@@ -251,9 +305,11 @@ public partial class MainViewModel : ObservableObject
                 _dispatch(() => StatusText = $"Error fetching {pf.Url}: {pf.Error}");
                 break;
 
-            case PageParsedEvent:
+            case PageParsedEvent pp:
+                var content = FormattedPageContentBuilder.Build(pp.Page, _visitedUrls);
                 _dispatch(() =>
                 {
+                    CurrentPage = content;
                     PagesProcessed++;
                     StatusText = $"Training on page {PagesProcessed}…";
                 });
@@ -265,6 +321,10 @@ public partial class MainViewModel : ObservableObject
 
             case GgufExportedEvent ge:
                 _dispatch(() => StatusText = $"GGUF exported: {ge.Path} ({ge.FileSizeBytes / 1024:N0} KB)");
+                break;
+
+            case TrainingQueueChangedEvent tq:
+                _dispatch(() => TrainingQueueDepth = tq.QueueDepth);
                 break;
 
             case SessionErrorEvent se:

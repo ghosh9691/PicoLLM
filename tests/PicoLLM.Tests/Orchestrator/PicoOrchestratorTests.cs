@@ -199,6 +199,106 @@ public class PicoOrchestratorTests : IDisposable
         new FileInfo(ggufPath).Length.Should().BeGreaterThan(0);
     }
 
+    // ── BrowseAsync tests ────────────────────────────────────────────────────
+
+    [Fact]
+    public async Task BrowseAsync_ReturnsParsedPage_Immediately()
+    {
+        const string html = """
+            <html><body>
+            <h1>Hello</h1>
+            <p>Quick brown fox content for testing the browse path.</p>
+            </body></html>
+            """;
+
+        var config = MakeConfig(_dataDir);
+        var orch = new PicoOrchestrator(config, FakeHttp(html));
+
+        var page = await orch.BrowseAsync("https://example.com/page");
+
+        page.Should().NotBeNull();
+        page!.CleanText.Should().NotBeEmpty();
+    }
+
+    [Fact]
+    public async Task BrowseAsync_EmitsPageFetchedAndPageParsedEvents()
+    {
+        const string html = """
+            <html><body>
+            <p>Content for browse event test.</p>
+            </body></html>
+            """;
+
+        var events = new List<OrchestratorEvent>();
+        var config = MakeConfig(_dataDir);
+        var orch = new PicoOrchestrator(config, FakeHttp(html));
+        orch.OnProgress += events.Add;
+
+        await orch.BrowseAsync("https://example.com/browse");
+
+        events.OfType<PageFetchedEvent>().Should().ContainSingle(e => e.Success);
+        events.OfType<PageParsedEvent>().Should().ContainSingle(e => e.TextLength > 0);
+    }
+
+    [Fact]
+    public async Task BrowseAsync_FailedFetch_ReturnsNull_AndEmitsError()
+    {
+        var events = new List<OrchestratorEvent>();
+        var config = MakeConfig(_dataDir);
+        var orch = new PicoOrchestrator(config, FailingHttp());
+        orch.OnProgress += events.Add;
+
+        var page = await orch.BrowseAsync("https://example.com/bad");
+
+        page.Should().BeNull();
+        events.OfType<PageFetchedEvent>().Should().ContainSingle(e => !e.Success);
+    }
+
+    [Fact]
+    public async Task BrowseAsync_QueueDepthEventEmitted()
+    {
+        const string html = """
+            <html><body>
+            <p>Training queue depth event test content here.</p>
+            </body></html>
+            """;
+
+        var events = new List<OrchestratorEvent>();
+        var config = MakeConfig(_dataDir);
+        var orch = new PicoOrchestrator(config, FakeHttp(html));
+        orch.OnProgress += events.Add;
+
+        await orch.BrowseAsync("https://example.com/q");
+
+        events.OfType<TrainingQueueChangedEvent>().Should().NotBeEmpty();
+    }
+
+    [Fact]
+    public async Task BrowseAsync_MultiplePages_ProcessedInFifoOrder()
+    {
+        var fetchOrder = new List<string>();
+        Func<string, CancellationToken, Task<BrowseResult>> orderedHttp = (url, _) =>
+        {
+            fetchOrder.Add(url);
+            return Task.FromResult(new BrowseResult(
+                Url: url, Status: BrowseStatus.Success,
+                HtmlContent: "<html><body><p>Content for " + url + ".</p></body></html>",
+                ErrorMessage: null, HttpStatusCode: 200, ElapsedTime: TimeSpan.Zero));
+        };
+
+        var config = MakeConfig(_dataDir);
+        var orch = new PicoOrchestrator(config, orderedHttp);
+
+        await orch.BrowseAsync("https://example.com/p1");
+        await orch.BrowseAsync("https://example.com/p2");
+        await orch.BrowseAsync("https://example.com/p3");
+
+        fetchOrder.Should().Equal(
+            "https://example.com/p1",
+            "https://example.com/p2",
+            "https://example.com/p3");
+    }
+
     [Fact]
     public async Task EndSession_EmitsCheckpointAndGgufEvents()
     {
